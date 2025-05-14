@@ -1,19 +1,35 @@
+# ระบบช่วยสร้าง Prompt สำหรับเกม
 
-# Game Prompt Generator
+ระบบนี้ช่วยให้คุณสร้าง Prompt เพื่อใช้กับ Canva AI สำหรับออกแบบเกมการเรียนรู้ โดยกรอกเพียงรายวิชาและแนวคิด พร้อมบันทึกข้อมูลลง Google Sheets ได้
 
-ระบบสร้าง Prompt สำหรับ Canva AI โดยกรอกข้อมูลรายวิชา แนวคิดเกม ระดับชั้น และจำนวนผู้เล่น
+## ไฟล์ประกอบ
+- `index.html` — หน้าแรกสำหรับกรอกข้อมูลและสร้าง Prompt
+- `script.js` — สคริปต์สำหรับสร้าง Prompt และบันทึก Google Sheets
+- `view.html` — หน้าสำหรับดู Prompt ที่สร้างไว้
+- `README.md` — คำอธิบายระบบ
 
-## Features
+## วิธีใช้งาน
+1. เปิด `index.html` เพื่อเริ่มสร้าง Prompt
+2. กด Generate เพื่อสร้าง Prompt ทั้ง 10 แบบ
+3. แต่ละ Prompt จะถูกบันทึกไปยัง Google Sheets โดยใช้ Apps Script
+4. ใช้ `view.html` เพื่อดู Prompt ที่เคยสร้าง โดยกรองตามวิชาได้
 
-- Generate 10 Prompts แบบ 2 ภาษา (EN/TH)
-- Copy / Save to Google Sheet
-- View & Filter Prompts by Subject and Level
-- Tailwind CSS design
-- Ready for GitHub Pages
+## การเชื่อมต่อ Google Sheets
 
-## Deployment
+1. สร้าง Google Sheet และเปิดเมนู `Extensions > Apps Script`
+2. วางโค้ด Apps Script ต่อไปนี้:
 
-1. Upload files to GitHub repo
-2. Set up Google Apps Script as shown in `/docs/script.gs`
-3. Deploy as Web App (accessible by Anyone)
-4. Replace `YOUR_SCRIPT_ID` in script.js and index.html
+```javascript
+function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Prompt") || SpreadsheetApp.getActiveSpreadsheet().insertSheet("Prompt");
+  var data = JSON.parse(e.postData.contents);
+  sheet.appendRow([new Date(), data.subject, data.concept, data.gameType, data.grade, data.players, data.prompt]);
+  return ContentService.createTextOutput("Success").setMimeType(ContentService.MimeType.TEXT);
+}
+```
+
+3. กด Deploy > New Deployment
+4. เลือก "Web App", ตั้งชื่อ, ให้สิทธิ์ "Anyone"
+5. คัดลอก URL มาใส่ใน `script.js` ตรง `const SHEET_URL`
+
+> จัดทำโดย ครูนิด (Krunid)
