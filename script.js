@@ -1,59 +1,73 @@
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbxZUQyqdSvxXr7bassd6bXt7NAG0hbE9DLmMBSDYGkWl4j7maUHGeMqF2uNICkeUIzb/exec";
 
-function generatePrompts() {
-  const subject = document.getElementById("subject").value;
-  const concept = document.getElementById("concept").value;
-  const gameType = document.getElementById("gameType").value;
-  const grade = document.getElementById("grade").value;
-  const players = document.getElementById("players").value;
-  const resultDiv = document.getElementById("result");
-  resultDiv.innerHTML = "";
+let allPrompts = [];
 
-  for (let i = 1; i <= 10; i++) {
-    const promptText = \`
-Prompt \${i}: 
-Create a highly detailed game design prompt for Canva AI.
+async function fetchData() {
+  const res = await fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec");
+  const data = await res.json();
+  allPrompts = data;
+  populateFilters(data);
+  renderPrompts(data);
+}
 
-🎯 Subject: \${subject}
-🎮 Game Concept: \${concept}
-🧠 Game Type: \${gameType}
-🏫 Grade Level: \${grade}
-👥 Players: \${players}
+function populateFilters(data) {
+  const subjectSet = new Set();
+  const levelSet = new Set();
 
-Write a 500-word prompt describing a creative, engaging, and classroom-ready \${gameType} for the subject "\${subject}" aimed at students in \${grade}. The game should reflect the concept: "\${concept}", be suitable for \${players} players, and include instructions, objectives, and sample gameplay scenarios.
+  data.forEach(d => {
+    subjectSet.add(d.Subject);
+    levelSet.add(d.Level);
+  });
 
-Make it creative, original, and suitable for Canva AI game generation — with vivid descriptions, mechanics, and imaginative details.\`.trim();
+  const subjectSel = document.getElementById("filterSubject");
+  const levelSel = document.getElementById("filterLevel");
 
-    const container = document.createElement("div");
-    container.className = "bg-white p-4 rounded shadow-md border relative";
+  subjectSet.forEach(sub => {
+    const opt = document.createElement("option");
+    opt.value = sub;
+    opt.textContent = sub;
+    subjectSel.appendChild(opt);
+  });
 
-    const copyBtn = document.createElement("button");
-    copyBtn.textContent = "📋 คัดลอก Prompt นี้";
-    copyBtn.className = "absolute top-2 right-2 text-sm text-indigo-600 hover:underline";
-    copyBtn.onclick = () => {
-      navigator.clipboard.writeText(promptText);
-      alert("คัดลอกเรียบร้อยแล้ว!");
+  levelSet.forEach(lv => {
+    const opt = document.createElement("option");
+    opt.value = lv;
+    opt.textContent = lv;
+    levelSel.appendChild(opt);
+  });
+}
 
-      // ส่งไปยัง Google Sheets
-      fetch(SHEET_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subject, concept, gameType, grade, players, prompt: promptText })
-      }).catch(err => console.error("Error:", err));
-    };
+function filterPrompts() {
+  const subject = document.getElementById("filterSubject").value;
+  const level = document.getElementById("filterLevel").value;
+  const filtered = allPrompts.filter(p => {
+    return (!subject || p.Subject === subject) && (!level || p.Level === level);
+  });
+  renderPrompts(filtered);
+}
 
-    const pre = document.createElement("pre");
-    pre.textContent = promptText;
-    pre.className = "whitespace-pre-wrap";
+function renderPrompts(data) {
+  const container = document.getElementById("promptContainer");
+  container.innerHTML = "";
 
-    container.appendChild(copyBtn);
-    container.appendChild(pre);
-    resultDiv.appendChild(container);
+  if (data.length === 0) {
+    container.innerHTML = "<p class='text-gray-500'>ไม่พบข้อมูล</p>";
+    return;
   }
+
+  data.forEach((p, i) => {
+    const box = document.createElement("div");
+    box.className = "bg-white border border-gray-200 shadow rounded-lg p-4";
+    box.innerHTML = `
+      <p><strong>Prompt #${i + 1}</strong></p>
+      <p><strong>รายวิชา:</strong> ${p.Subject}</p>
+      <p><strong>ระดับชั้น:</strong> ${p.Level}</p>
+      <p><strong>แนวเกม:</strong> ${p.Concept}</p>
+      <p><strong>ประเภทเกม:</strong> ${p.GameType}</p>
+      <p><strong>จำนวนผู้เล่น:</strong> ${p.Players}</p>
+      <textarea class="w-full mt-2 p-2 border rounded" rows="8">${p.Prompt}</textarea>
+    `;
+    container.appendChild(box);
+  });
 }
 
-
-function syncConcept() {
-  const selected = document.getElementById("conceptSelect").value;
-  document.getElementById("concept").value = selected;
-}
+fetchData();
