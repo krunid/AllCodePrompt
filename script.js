@@ -2,7 +2,7 @@
 let allPrompts = [];
 
 async function fetchData() {
-  const res = await fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec");
+  const res = await fetch("https://script.google.com/macros/s/AKfycbxZUQyqdSvxXr7bassd6bXt7NAG0hbE9DLmMBSDYGkWl4j7maUHGeMqF2uNICkeUIzb/exec");
   const data = await res.json();
   allPrompts = data;
   populateFilters(data);
