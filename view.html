@@ -1,0 +1,30 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>รายการ Prompt ทั้งหมด</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-blue-50 min-h-screen p-6 font-sans">
+  <div class="max-w-6xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+    <h1 class="text-2xl font-bold text-blue-700 mb-4">รายการ Prompt ทั้งหมด</h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+      <div>
+        <label>กรองตามวิชา:</label>
+        <select id="filterSubject" class="w-full p-2 border rounded" onchange="filterPrompts()">
+          <option value="">ทั้งหมด</option>
+        </select>
+      </div>
+      <div>
+        <label>กรองตามระดับชั้น:</label>
+        <select id="filterLevel" class="w-full p-2 border rounded" onchange="filterPrompts()">
+          <option value="">ทั้งหมด</option>
+        </select>
+      </div>
+    </div>
+    <div id="promptContainer" class="space-y-6"></div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

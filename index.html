@@ -1,0 +1,179 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <title data-lang="title">ระบบสร้าง Prompt เกม</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-blue-50 min-h-screen flex flex-col" class="bg-blue-50 min-h-screen p-6 font-sans">
+  
+    <header class="bg-blue-700 text-white p-4 text-center text-xl font-semibold shadow">
+      Game Prompt Generator by ครูนิด
+    </header>
+    <main class="flex-1">
+      <div class="max-w-5xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+    
+    <div class="flex justify-between items-center">
+      <h1 class="text-2xl font-bold text-blue-700" data-lang="title">ระบบสร้าง Prompt เกม</h1>
+      <div class="space-x-2">
+        <button onclick="switchLanguage('th')" class="text-sm underline">ไทย</button>
+        <button onclick="switchLanguage('en')" class="text-sm underline">English</button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+      <div>
+        <label class="block mb-1" data-lang="subject">รายวิชา</label>
+        <select id="subject" class="w-full p-2 border rounded">
+          <option>ภาษาไทย</option><option>คณิตศาสตร์</option><option>วิทยาศาสตร์</option>
+          <option>สังคมศึกษา</option><option>ประวัติศาสตร์</option><option>สุขศึกษาและพลศึกษา</option>
+          <option>ศิลปะ</option><option>การงานอาชีพ</option><option>ภาษาอังกฤษ</option><option>เทคโนโลยี</option>
+        </select>
+      </div>
+      <div>
+        <label class="block mb-1" data-lang="concept">แนวเกม</label>
+        <select id="concept" class="w-full p-2 border rounded">
+          <option>เกมสะสมไอเทม</option><option>เกมตอบคำถาม</option><option>เกมแข่งขันเร็ว</option>
+          <option>เกมบอร์ดวางแผน</option><option>เกมจำลองสถานการณ์</option><option>เกม RPG (สวมบทบาท)</option>
+          <option>เกมปริศนาไขรหัส</option><option>เกมใช้ความร่วมมือ</option><option>เกมใช้การเคลื่อนไหว/ร่างกาย</option>
+          <option>เกมใช้มือถือ/AR</option>
+        </select>
+      </div>
+      <div>
+        <label class="block mb-1" data-lang="level">ระดับชั้น</label>
+        <select id="level" class="w-full p-2 border rounded">
+          <option>ประถมต้น</option><option>ประถมปลาย</option><option>มัธยมต้น</option><option>มัธยมปลาย</option>
+        </select>
+      </div>
+      <div>
+        <label class="block mb-1" data-lang="players">จำนวนผู้เล่น</label>
+        <input type="text" id="players" class="w-full p-2 border rounded" placeholder="เช่น 2-6 คน" />
+      </div>
+      <div class="md:col-span-2">
+        <label class="block mb-1" data-lang="game_type">ประเภทเกม</label>
+        <select id="gameType" class="w-full p-2 border rounded">
+          <option>Board Game</option><option>Card Game</option><option>Simulation</option>
+          <option>Puzzle Game</option><option>Escape Room</option><option>Strategy Game</option>
+          <option>RPG</option><option>Mobile App Game</option><option>AR Game</option><option>Quiz Game</option>
+        </select>
+      </div>
+    </div>
+
+    <button onclick="generatePrompts()" class="mt-6 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded" data-lang="generate">สร้าง Prompt</button>
+
+    <div id="promptList" class="mt-8 space-y-6"></div>
+    </main>
+    <footer class="bg-gray-200 text-center text-sm py-3 text-gray-700">© 2025 ครูนิด ศิษย์หลวงพ่อเสือ</footer>
+
+  <script>
+    let currentLang = "th";
+    let langData = {
+      "th": {
+        "title": "ระบบสร้าง Prompt เกม",
+        "generate": "สร้าง Prompt",
+        "copy": "คัดลอก",
+        "save": "บันทึกไป Google Sheet",
+        "players": "จำนวนผู้เล่น",
+        "subject": "รายวิชา",
+        "level": "ระดับชั้น",
+        "game_type": "ประเภทเกม",
+        "concept": "แนวเกม"
+      },
+      "en": {
+        "title": "Game Prompt Generator",
+        "generate": "Generate Prompt",
+        "copy": "Copy",
+        "save": "Save to Google Sheet",
+        "players": "Number of Players",
+        "subject": "Subject",
+        "level": "Grade Level",
+        "game_type": "Game Type",
+        "concept": "Game Concept"
+      }
+    };
+
+    function switchLanguage(lang) {
+      currentLang = lang;
+      document.querySelectorAll("[data-lang]").forEach(el => {
+        const key = el.getAttribute("data-lang");
+        el.innerText = langData[lang][key] || key;
+      });
+    }
+
+    function generatePrompts() {
+      const subject = document.getElementById("subject").value;
+      const concept = document.getElementById("concept").value;
+      const level = document.getElementById("level").value;
+      const players = document.getElementById("players").value || "2-4 คน";
+      const gameType = document.getElementById("gameType").value;
+      const promptList = document.getElementById("promptList");
+      promptList.innerHTML = "";
+
+      for (let i = 1; i <= 10; i++) {
+        const en = `Prompt ${i}:
+Create a creative ${gameType} for ${level} students in the subject "${subject}".
+Game idea: "${concept}" — For ${players} players.
+
+Describe:
+- Game mechanics, objectives
+- Materials, visual ideas for Canva AI
+- How it teaches ${subject}
+- Theme, characters, interactivity
+
+Write at least 500 words.`;
+
+        const th = `Prompt ${i} (แปลไทย):
+ออกแบบเกมประเภท ${gameType} สำหรับนักเรียนระดับ ${level} ในรายวิชา "${subject}"
+แนวคิดหลักของเกม: "${concept}" เล่นได้ ${players} คน
+
+อธิบาย:
+- กลไกและเป้าหมายของเกม
+- วัสดุอุปกรณ์ / ไอเดียภาพประกอบ
+- วิธีเชื่อมโยงกับเนื้อหาวิชา ${subject}
+- ธีมเกม ตัวละคร และความสนุกแบบโต้ตอบ
+
+ความยาวอย่างน้อย 500 คำ เพื่อให้ Canva AI สร้างเกมได้สมบูรณ์`;
+
+        const box = document.createElement("div");
+        box.className = "bg-white border p-4 rounded-lg shadow";
+
+        const textarea = document.createElement("textarea");
+        textarea.className = "w-full p-2 border rounded";
+        textarea.rows = 12;
+        textarea.value = en + "\n\n" + th;
+
+        const copyBtn = document.createElement("button");
+        copyBtn.className = "mt-2 bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded";
+        copyBtn.textContent = langData[currentLang]["copy"];
+        copyBtn.onclick = () => {
+          navigator.clipboard.writeText(textarea.value);
+          alert("คัดลอกแล้ว!");
+        };
+
+        const saveBtn = document.createElement("button");
+        saveBtn.className = "mt-2 ml-2 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-1 rounded";
+        saveBtn.textContent = langData[currentLang]["save"];
+        saveBtn.onclick = () => {
+          fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec", {
+            method: "POST",
+            body: JSON.stringify({ subject, concept, level, players, gameType, prompt: textarea.value }),
+            headers: { "Content-Type": "application/json" }
+          })
+          .then(r => r.text())
+          .then(t => alert("บันทึกสำเร็จ: " + t))
+          .catch(e => alert("เกิดข้อผิดพลาด: " + e));
+        };
+
+        box.appendChild(textarea);
+        box.appendChild(copyBtn);
+        box.appendChild(saveBtn);
+        promptList.appendChild(box);
+      }
+    }
+
+    switchLanguage("th");
+  </script>
+</body>
+</html>
